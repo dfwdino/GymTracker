@@ -1,0 +1,83 @@
+@page "/locations"
+@using GymTracker.Domain.Models
+@using GymTracker.Application.Services
+@inject LocationService LocationService
+
+<h3>Locations</h3>
+
+<div class="row mb-3">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="() => ShowAddForm = true">Add New Location</button>
+    </div>
+</div>
+
+@if (ShowAddForm)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Add New Location</h5>
+            <EditForm Model="@NewLocation" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <InputText id="name" class="form-control" @bind-Value="NewLocation.Name" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="() => ShowAddForm = false">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var location in LocationList)
+        {
+            <tr>
+                <td>@location.Name</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteLocation(location.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Location> LocationList { get; set; } = new();
+    private Location NewLocation { get; set; } = new();
+    private bool ShowAddForm { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        LocationList = (await LocationService.GetAllAsync()).ToList();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await LocationService.AddAsync(NewLocation);
+        NewLocation = new Location();
+        ShowAddForm = false;
+        await LoadData();
+    }
+
+    private async Task DeleteLocation(int id)
+    {
+        await LocationService.DeleteAsync(id);
+        await LoadData();
+    }
+} 

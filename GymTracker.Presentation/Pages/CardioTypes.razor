@@ -1,0 +1,83 @@
+@page "/cardio-types"
+@using GymTracker.Domain.Models
+@using GymTracker.Application.Services
+@inject CardioTypeService CardioTypeService
+
+<h3>Cardio Types</h3>
+
+<div class="row mb-3">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="() => ShowAddForm = true">Add New Cardio Type</button>
+    </div>
+</div>
+
+@if (ShowAddForm)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Add New Cardio Type</h5>
+            <EditForm Model="@NewType" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <InputText id="name" class="form-control" @bind-Value="NewType.Name" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="() => ShowAddForm = false">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var type in Types)
+        {
+            <tr>
+                <td>@type.Name</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteType(type.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<CardioType> Types { get; set; } = new();
+    private CardioType NewType { get; set; } = new();
+    private bool ShowAddForm { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        Types = (await CardioTypeService.GetAllAsync()).ToList();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await CardioTypeService.AddAsync(NewType);
+        NewType = new CardioType();
+        ShowAddForm = false;
+        await LoadData();
+    }
+
+    private async Task DeleteType(int id)
+    {
+        await CardioTypeService.DeleteAsync(id);
+        await LoadData();
+    }
+} 

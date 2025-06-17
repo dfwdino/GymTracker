@@ -1,0 +1,132 @@
+@page "/cardio-sessions"
+@using GymTracker.Domain.Models
+@using GymTracker.Application.Services
+@inject CardioSessionService CardioSessionService
+@inject CardioTypeService CardioTypeService
+@inject LocationService LocationService
+
+<h3>Cardio Sessions</h3>
+
+<div class="row mb-3">
+    <div class="col">
+        <button class="btn btn-primary" @onclick="() => ShowAddForm = true">Add New Session</button>
+    </div>
+</div>
+
+@if (ShowAddForm)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Add New Cardio Session</h5>
+            <EditForm Model="@NewSession" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="cardioType" class="form-label">Cardio Type</label>
+                    <InputSelect id="cardioType" class="form-select" @bind-Value="NewSession.CardioTypeId">
+                        <option value="">Select a cardio type</option>
+                        @foreach (var type in CardioTypes)
+                        {
+                            <option value="@type.Id">@type.Name</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <InputSelect id="location" class="form-select" @bind-Value="NewSession.LocationId">
+                        <option value="">Select a location</option>
+                        @foreach (var location in Locations)
+                        {
+                            <option value="@location.Id">@location.Name</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Duration (minutes)</label>
+                    <InputNumber id="duration" class="form-control" @bind-Value="DurationMinutes" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="caloriesBurned" class="form-label">Calories Burned</label>
+                    <InputNumber id="caloriesBurned" class="form-control" @bind-Value="NewSession.CaloriesBurned" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="dateTime" class="form-label">Date and Time</label>
+                    <InputDate id="dateTime" class="form-control" @bind-Value="NewSession.DateTime" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary" @onclick="() => ShowAddForm = false">Cancel</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date and Time</th>
+            <th>Cardio Type</th>
+            <th>Location</th>
+            <th>Duration</th>
+            <th>Calories Burned</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var session in Sessions)
+        {
+            <tr>
+                <td>@session.DateTime</td>
+                <td>@CardioTypes.FirstOrDefault(t => t.Id == session.CardioTypeId)?.Name</td>
+                <td>@Locations.FirstOrDefault(l => l.Id == session.LocationId)?.Name</td>
+                <td>@session.Duration.TotalMinutes minutes</td>
+                <td>@session.CaloriesBurned</td>
+                <td>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteSession(session.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<CardioSession> Sessions { get; set; } = new();
+    private List<CardioType> CardioTypes { get; set; } = new();
+    private List<Location> Locations { get; set; } = new();
+    private CardioSession NewSession { get; set; } = new() { DateTime = DateTime.Now };
+    private int DurationMinutes { get; set; }
+    private bool ShowAddForm { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        Sessions = (await CardioSessionService.GetAllAsync()).ToList();
+        CardioTypes = (await CardioTypeService.GetAllAsync()).ToList();
+        Locations = (await LocationService.GetAllAsync()).ToList();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        NewSession.Duration = TimeSpan.FromMinutes(DurationMinutes);
+        await CardioSessionService.AddAsync(NewSession);
+        NewSession = new CardioSession { DateTime = DateTime.Now };
+        DurationMinutes = 0;
+        ShowAddForm = false;
+        await LoadData();
+    }
+
+    private async Task DeleteSession(int id)
+    {
+        await CardioSessionService.DeleteAsync(id);
+        await LoadData();
+    }
+} 
