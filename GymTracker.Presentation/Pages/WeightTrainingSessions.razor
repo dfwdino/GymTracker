@@ -25,7 +25,7 @@
                 <div class="mb-3">
                     <label for="workoutType" class="form-label">Workout Type</label>
                     <InputSelect id="workoutType" class="form-select" @bind-Value="NewSession.WorkoutTypeId">
-                        <option value="">Select a workout type</option>
+                        <option value="0" selected>Select a workout type</option>
                         @foreach (var type in WorkoutTypes)
                         {
                             <option value="@type.Id">@type.Name</option>
@@ -36,7 +36,7 @@
                 <div class="mb-3">
                     <label for="location" class="form-label">Location</label>
                     <InputSelect id="location" class="form-select" @bind-Value="NewSession.LocationId">
-                        <option value="">Select a location</option>
+                        <option value="0" selected>Select a location</option>
                         @foreach (var location in Locations)
                         {
                             <option value="@location.Id">@location.Name</option>

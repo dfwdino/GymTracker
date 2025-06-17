@@ -32,6 +32,7 @@ CREATE TABLE workout.CardioSessions (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     DateTime DATETIME NOT NULL,
     Duration TIME NOT NULL,
+    Distance DECIMAL(10,2) NOT NULL,
     CaloriesBurned INT NOT NULL,
     CardioTypeId INT NOT NULL,
     LocationId INT NOT NULL,

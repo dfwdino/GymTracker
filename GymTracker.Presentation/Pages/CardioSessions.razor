@@ -25,7 +25,8 @@
                 <div class="mb-3">
                     <label for="cardioType" class="form-label">Cardio Type</label>
                     <InputSelect id="cardioType" class="form-select" @bind-Value="NewSession.CardioTypeId">
-                        <option value="">Select a cardio type</option>
+
+                        <option value="" selected>Select a cardio type</option>
                         @foreach (var type in CardioTypes)
                         {
                             <option value="@type.Id">@type.Name</option>
@@ -36,7 +37,7 @@
                 <div class="mb-3">
                     <label for="location" class="form-label">Location</label>
                     <InputSelect id="location" class="form-select" @bind-Value="NewSession.LocationId">
-                        <option value="">Select a location</option>
+                        <option value="" selected>Select a location</option>
                         @foreach (var location in Locations)
                         {
                             <option value="@location.Id">@location.Name</option>
@@ -47,6 +48,11 @@
                 <div class="mb-3">
                     <label for="duration" class="form-label">Duration (minutes)</label>
                     <InputNumber id="duration" class="form-control" @bind-Value="DurationMinutes" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="distance" class="form-label">Distance (miles)</label>
+                    <InputNumber id="distance" class="form-control" @bind-Value="NewSession.Distance" />
                 </div>
 
                 <div class="mb-3">
@@ -73,6 +79,7 @@
             <th>Cardio Type</th>
             <th>Location</th>
             <th>Duration</th>
+            <th>Distance</th>
             <th>Calories Burned</th>
             <th>Actions</th>
         </tr>
@@ -85,6 +92,7 @@
                 <td>@CardioTypes.FirstOrDefault(t => t.Id == session.CardioTypeId)?.Name</td>
                 <td>@Locations.FirstOrDefault(l => l.Id == session.LocationId)?.Name</td>
                 <td>@session.Duration.TotalMinutes minutes</td>
+                <td>@session.Distance miles</td>
                 <td>@session.CaloriesBurned</td>
                 <td>
                     <button class="btn btn-sm btn-danger" @onclick="() => DeleteSession(session.Id)">Delete</button>
