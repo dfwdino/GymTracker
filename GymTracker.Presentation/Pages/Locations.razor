@@ -7,26 +7,24 @@
 
 <div class="row mb-3">
     <div class="col">
-        <button class="btn btn-primary" @onclick="() => ShowAddForm = true">Add New Location</button>
+        <button class="btn btn-primary" @onclick="ShowAddLocationForm">Add New Location</button>
     </div>
 </div>
 
-@if (ShowAddForm)
+@if (ShowAddForm || ShowEditForm)
 {
     <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">Add New Location</h5>
-            <EditForm Model="@NewLocation" OnValidSubmit="HandleValidSubmit">
+            <h5 class="card-title">@((ShowEditForm ? "Edit" : "Add New") + " Location")</h5>
+            <EditForm Model="@CurrentLocation" OnValidSubmit="HandleValidSubmit">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <InputText id="name" class="form-control" @bind-Value="NewLocation.Name" />
+                    <InputText id="name" class="form-control" @bind-Value="@CurrentLocation.Name" />
                 </div>
-
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button type="button" class="btn btn-secondary" @onclick="() => ShowAddForm = false">Cancel</button>
+                <button type="submit" class="btn btn-primary">@((ShowEditForm ? "Update" : "Save"))</button>
+                <button type="button" class="btn btn-secondary" @onclick="CancelForm">Cancel</button>
             </EditForm>
         </div>
     </div>
@@ -45,7 +43,8 @@
             <tr>
                 <td>@location.Name</td>
                 <td>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteLocation(location.Id)">Delete</button>
+                    <button class="btn btn-sm btn-primary me-2" @onclick="() => StartEditLocation(location)">Edit</button>
+                    <button class="btn btn-sm btn-danger" @onclick="async () => await DeleteLocation(location.Id)">Delete</button>
                 </td>
             </tr>
         }
@@ -55,7 +54,10 @@
 @code {
     private List<Location> LocationList { get; set; } = new();
     private Location NewLocation { get; set; } = new();
+    private Location EditLocation { get; set; } = new();
     private bool ShowAddForm { get; set; }
+    private bool ShowEditForm { get; set; }
+    private Location CurrentLocation => ShowEditForm ? EditLocation : NewLocation;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,15 +71,45 @@
 
     private async Task HandleValidSubmit()
     {
-        await LocationService.AddAsync(NewLocation);
+        if (ShowEditForm)
+        {
+            await LocationService.UpdateAsync(EditLocation);
+        }
+        else
+        {
+            await LocationService.AddAsync(NewLocation);
+        }
         NewLocation = new Location();
+        EditLocation = new Location();
         ShowAddForm = false;
+        ShowEditForm = false;
         await LoadData();
+    }
+
+    private void StartEditLocation(Location location)
+    {
+        EditLocation = location;
+        ShowEditForm = true;
+        ShowAddForm = false;
+    }
+
+    private void CancelForm()
+    {
+        ShowAddForm = false;
+        ShowEditForm = false;
+        NewLocation = new Location();
+        EditLocation = new Location();
     }
 
     private async Task DeleteLocation(int id)
     {
         await LocationService.DeleteAsync(id);
         await LoadData();
+    }
+
+    private void ShowAddLocationForm()
+    {
+        ShowAddForm = true;
+        ShowEditForm = false;
     }
 } 

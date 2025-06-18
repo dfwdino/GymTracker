@@ -21,6 +21,7 @@ CREATE TABLE workout.WeightTrainingSessions (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     DateTime DATETIME NOT NULL,
     Reps INT NOT NULL,
+    Sets INT NOT NULL,
     Weight DECIMAL(10,2) NOT NULL,
     WorkoutTypeId INT NOT NULL,
     LocationId INT NOT NULL,

@@ -1,11 +1,9 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using GymTracker.Presentation.Data;
-using GymTracker.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using GymTracker.Domain.Repositories;
-using GymTracker.Infrastructure.Repositories;
 using GymTracker.Application.Services;
+using GymTracker.Domain.Repositories;
+using GymTracker.Infrastructure.Data;
+using GymTracker.Infrastructure.Repositories;
+using GymTracker.Presentation.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +38,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 

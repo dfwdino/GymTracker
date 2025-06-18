@@ -32,6 +32,11 @@ public class CardioSessionRepository : ICardioSessionRepository
 
     public async Task UpdateAsync(CardioSession session)
     {
+        var existingSession = await _context.CardioSessions.FindAsync(session.Id);
+        if (existingSession != null)
+        {
+            _context.Entry(existingSession).State = EntityState.Detached;
+        }
         _context.CardioSessions.Update(session);
         await _context.SaveChangesAsync();
     }

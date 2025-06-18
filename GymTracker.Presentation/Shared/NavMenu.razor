@@ -1,69 +1,29 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">GymTracker.Presentation</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿@using Microsoft.AspNetCore.Components
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weight-training-sessions">
-                Weight Training Sessions
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="cardio-sessions">
-                Cardio Sessions
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="workout-types">
-                Workout Types
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="cardio-types">
-                Cardio Types
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="locations">
-                Locations
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="analytics">
-                Analytics
-            </NavLink>
-        </div>
-    </nav>
-</div>
+<nav class="nav-menu @Class">
+    <a class="nav-link" href="/">
+        <span class="oi oi-home"></span> Home
+    </a>
+    <a class="nav-link" href="/cardio-sessions">
+        <span class="oi oi-pulse"></span> Cardio Sessions
+    </a>
+    <a class="nav-link" href="/weight-training-sessions">
+        <span class="oi oi-bar-chart"></span> Weight Training
+    </a>
+    <a class="nav-link" href="/locations">
+        <span class="oi oi-map-marker"></span> Locations
+    </a>
+    <a class="nav-link" href="/workout-types">
+        <span class="oi oi-list"></span> Workout Types
+    </a>
+    <a class="nav-link" href="/cardio-types">
+        <span class="oi oi-heart"></span> Cardio Types
+    </a>
+    <a class="nav-link" href="/analytics">
+        <span class="oi oi-graph"></span> Analytics
+    </a>
+</nav>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+    [Parameter] public string Class { get; set; }
 }

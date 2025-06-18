@@ -7,26 +7,24 @@
 
 <div class="row mb-3">
     <div class="col">
-        <button class="btn btn-primary" @onclick="() => ShowAddForm = true">Add New Workout Type</button>
+        <button class="btn btn-primary" @onclick="ShowAddTypeForm">Add New Workout Type</button>
     </div>
 </div>
 
-@if (ShowAddForm)
+@if (ShowAddForm || ShowEditForm)
 {
     <div class="card mb-3">
         <div class="card-body">
-            <h5 class="card-title">Add New Workout Type</h5>
-            <EditForm Model="@NewType" OnValidSubmit="HandleValidSubmit">
+            <h5 class="card-title">@(ShowEditForm ? "Edit Workout Type" : "Add New Workout Type")</h5>
+            <EditForm Model="@CurrentType" OnValidSubmit="HandleValidSubmit">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
-                    <InputText id="name" class="form-control" @bind-Value="NewType.Name" />
+                    <InputText id="name" class="form-control" @bind-Value="@CurrentType.Name" />
                 </div>
-
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button type="button" class="btn btn-secondary" @onclick="() => ShowAddForm = false">Cancel</button>
+                <button type="submit" class="btn btn-primary">@(ShowEditForm ? "Update" : "Save")</button>
+                <button type="button" class="btn btn-secondary" @onclick="CancelForm">Cancel</button>
             </EditForm>
         </div>
     </div>
@@ -45,7 +43,8 @@
             <tr>
                 <td>@type.Name</td>
                 <td>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteType(type.Id)">Delete</button>
+                    <button class="btn btn-sm btn-primary me-2" @onclick="() => StartEditType(type)">Edit</button>
+                    <button class="btn btn-sm btn-danger" @onclick="async () => await DeleteType(type.Id)">Delete</button>
                 </td>
             </tr>
         }
@@ -55,7 +54,10 @@
 @code {
     private List<WorkoutType> Types { get; set; } = new();
     private WorkoutType NewType { get; set; } = new();
+    private WorkoutType EditType { get; set; } = new();
     private bool ShowAddForm { get; set; }
+    private bool ShowEditForm { get; set; }
+    private WorkoutType CurrentType => ShowEditForm ? EditType : NewType;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,15 +71,45 @@
 
     private async Task HandleValidSubmit()
     {
-        await WorkoutTypeService.AddAsync(NewType);
+        if (ShowEditForm)
+        {
+            await WorkoutTypeService.UpdateAsync(EditType);
+        }
+        else
+        {
+            await WorkoutTypeService.AddAsync(NewType);
+        }
         NewType = new WorkoutType();
+        EditType = new WorkoutType();
         ShowAddForm = false;
+        ShowEditForm = false;
         await LoadData();
+    }
+
+    private void StartEditType(WorkoutType type)
+    {
+        EditType = type;
+        ShowEditForm = true;
+        ShowAddForm = false;
+    }
+
+    private void CancelForm()
+    {
+        ShowAddForm = false;
+        ShowEditForm = false;
+        NewType = new WorkoutType();
+        EditType = new WorkoutType();
     }
 
     private async Task DeleteType(int id)
     {
         await WorkoutTypeService.DeleteAsync(id);
         await LoadData();
+    }
+
+    private void ShowAddTypeForm()
+    {
+        ShowAddForm = true;
+        ShowEditForm = false;
     }
 } 

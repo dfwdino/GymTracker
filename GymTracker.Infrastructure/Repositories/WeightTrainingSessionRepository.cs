@@ -32,6 +32,11 @@ public class WeightTrainingSessionRepository : IWeightTrainingSessionRepository
 
     public async Task UpdateAsync(WeightTrainingSession session)
     {
+        var existingSession = await _context.WeightTrainingSessions.FindAsync(session.Id);
+        if (existingSession != null)
+        {
+            _context.Entry(existingSession).State = EntityState.Detached;
+        }
         _context.WeightTrainingSessions.Update(session);
         await _context.SaveChangesAsync();
     }
